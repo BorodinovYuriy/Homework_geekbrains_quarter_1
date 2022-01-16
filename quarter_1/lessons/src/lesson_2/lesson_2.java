@@ -11,8 +11,9 @@ public class lesson_2 {
 
     }
     public static boolean ten_twenty (int a, int b){
-        if ((a + b) >= 10 && (a + b) <= 20) return true;
-        else return false;
+        boolean check = false;
+        if ((a + b) >= 10 && (a + b) <= 20) check = true;
+        return check;
     }
     public static void positive (int number){
         if (number >= 0) System.out.println("Число "+number+" - положительное.");
@@ -20,15 +21,17 @@ public class lesson_2 {
 
     }
     public static boolean negativeTF(int number){
-        if (number < 0) return true;
-        else return false;
+        boolean check = false;
+        if (number < 0) check = true;
+        return check;
     }
     public static void strPrint(String str, int n){
         for (int i = 0; i < n; i++) System.out.println(str);
     }
     public static boolean visokos (int year){
-        if (year % 100 == 0 && year % 400 == 0) return true;
-        else if (year % 4 == 0 && year % 100 > 0) return true;
-        else return false;
+        boolean check = false;
+        if (year % 100 == 0 && year % 400 == 0) check = true;
+        else if (year % 4 == 0 && year % 100 > 0) check = true;
+        return check;
     }
 }
