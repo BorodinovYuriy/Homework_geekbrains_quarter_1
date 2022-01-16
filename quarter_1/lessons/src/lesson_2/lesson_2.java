@@ -7,7 +7,7 @@ public class lesson_2 {
         positive(4);                            //2
         System.out.println(negativeTF(3));     //3
         strPrint("five", 5);                   //4
-        System.out.println(visokos(2000));      //5
+        System.out.println(visokos(2001));      //5
 
     }
     public static boolean ten_twenty (int a, int b){
@@ -30,8 +30,8 @@ public class lesson_2 {
     }
     public static boolean visokos (int year){
         boolean check = false;
-        if (year % 100 == 0 && year % 400 == 0) check = true;
-        else if (year % 4 == 0 && year % 100 > 0) check = true;
+        if ((year % 100 == 0 && year % 400 == 0) || (year % 4 == 0 && year % 100 > 0)) check = true;
         return check;
+
     }
 }
