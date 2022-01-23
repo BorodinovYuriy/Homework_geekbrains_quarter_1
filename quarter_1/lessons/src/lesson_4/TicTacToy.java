@@ -9,6 +9,7 @@ public class TicTacToy {
     public static final char DOT_EMPTY = '•';   // 8226 UTF
     public static final char DOT_X = 'X';
     public static final char DOT_O = 'O';
+    public static final int DANGER_FOR_AI = 3;
 
 
     public static Random rand = new Random();
@@ -20,7 +21,7 @@ public class TicTacToy {
         while (true) {
             humanTurn();
             printMap();
-            if (checkWin(DOT_X)) {
+            if (checkWin(DOT_X, DOTS_TO_WIN)) {
                 System.out.println("Победил человек");
                 break;
             } if (isMapFull()) {
@@ -28,7 +29,7 @@ public class TicTacToy {
                 break;
             } aiTurn();
             printMap();
-            if (checkWin(DOT_O)) {
+            if (checkWin(DOT_O, DOTS_TO_WIN)) {
                 System.out.println("Победил Искуственный Интеллект");
                 break;
             } if (isMapFull()) {
@@ -69,7 +70,6 @@ public class TicTacToy {
             System.out.println("Введите координаты в формате: "+"\"строка/столбец\"");
             x = sc.nextInt() -1;
             y = sc.nextInt() -1;
-
         } while (!isCellValid(x, y));
         map [x][y] = DOT_X;
     }
@@ -83,12 +83,15 @@ public class TicTacToy {
         int y = -1;
         boolean aiWin = false;
         boolean humanWin = false;
-
+        boolean humanCheck = false;
+        boolean dangerAI = false;
+        boolean rnd = false;
+//1
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (isCellValid(i, j)){
                     map[i][j] = DOT_O;
-                    if (checkWin(DOT_O)){
+                    if (checkWin(DOT_O, DOTS_TO_WIN)){
                         x = i;
                         y = j;
                         aiWin = true;
@@ -97,12 +100,13 @@ public class TicTacToy {
                 }
             }
         }
+//2
         if (!aiWin){
             for (int i = 0; i < SIZE; i++) {
                 for (int j = 0; j < SIZE; j++) {
                     if (isCellValid(i, j)){
                         map[i][j] = DOT_X;
-                        if (checkWin(DOT_X)){
+                        if (checkWin(DOT_X, DOTS_TO_WIN)){
                             x = i;
                             y = j;
                             humanWin = true;
@@ -112,7 +116,55 @@ public class TicTacToy {
                 }
             }
         }
-        if (!aiWin && !humanWin){
+//3
+        if (!humanWin){
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    if (isCellValid(i, j)){
+                        map[i][j] = DOT_O;
+                        if (checkWin(DOT_O, DANGER_FOR_AI)){
+                            x = i;
+                            y = j;
+                            humanCheck = true;
+                        }
+                        map [i][j] = DOT_EMPTY;
+                    }
+                }
+            }
+        }
+//4
+        if (!humanCheck){
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    if (isCellValid(i, j)){
+                        map[i][j] = DOT_X;
+                        if (checkWin(DOT_X, DANGER_FOR_AI)){
+                            x = i;
+                            y = j;
+                            dangerAI = true;
+                        }
+                        map [i][j] = DOT_EMPTY;
+                    }
+                }
+            }
+        }
+        if (!dangerAI){
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    if (isCellValid(i, j)){
+                        map[i][j] = DOT_O;
+                        if (checkWin(DOT_O, DANGER_FOR_AI-1)){
+                            x = i;
+                            y = j;
+                            rnd = true;
+                        }
+                        map [i][j] = DOT_EMPTY;
+                    }
+                }
+            }
+        }
+
+        if (!aiWin && !humanWin && !humanCheck && !dangerAI && !rnd){
             do {
                 x = rand.nextInt(SIZE);
                 y = rand.nextInt(SIZE);
@@ -128,67 +180,60 @@ public class TicTacToy {
             }
         } return true;
     }
-    public static boolean checkWin(char symb) {//Переделано циклом for,ужас:(
+    public static boolean checkWin(char symb, int dot) {    //Переделано циклом for
         boolean win = false;
-        int winCount1;
-        int winCount2;
-        int winCount3 = 0;
-        int winCount4 = 0;
-        int winCount5 = 0;
-        int winCount6 = 0;
-        int winCount7 = 0;
-        int winCount8 = 0;
-        for (int i = 0; i < SIZE; i++) {
-            winCount1 = 0;
-            winCount2 = 0;
+        int count_1;
+        int count_2;
+        int count_3 = 0;
+        int count_4 = 0;
+        int count_5 = 0;
+        int count_6 = 0;
+        int count_7 = 0;
+        int count_8 = 0;
+
+        for (int i = 0, a = SIZE - 1; i < SIZE && a >= 0; i++, a--) {
+//1
+            if (map[i][i] == symb) count_3++;
+            else count_3 = 0;
+            if (count_3 == dot) win = true;
+//2
+            if (map[a][i] == symb) count_4++;
+            else count_4 = 0;
+            if (count_4 == dot) win = true;
+        }
+        for (int i = 0, z = 1, a = SIZE - 1; i < SIZE && z < SIZE && a >= 0 ; i++, z++, a--) {
+            count_1 = 0;
+            count_2 = 0;
+//3
+            if (map[i][z] == symb) count_5++;
+            //else count_5 = 0;
+            if (count_5 == dot) win = true;
+//4
+            if (map[z][i] == symb) count_6++;
+            //else count_6 = 0;
+            if (count_6 == dot) win = true;
+//5
+            if (map[i][a-1] == symb) count_7++;
+            //else count_7 = 0;
+            if (count_7 == dot) win = true;
+//6
+            if (map[a][z] == symb) count_8++;
+            //else count_8 = 0;
+            if (count_8 == dot) win = true;
+
             for (int j = 0; j < SIZE; j++) {
-                if (map[j][i] == symb) winCount2++;
-                if (map[j][i] == DOT_EMPTY) winCount2 = 0;
-                if (winCount2 == DOTS_TO_WIN) win = true;
-                if (map[i][j] == symb) winCount1++;
-                if (map[i][j] == DOT_EMPTY) winCount1 = 0;
-                if (winCount1 == DOTS_TO_WIN) win = true;
+//7
+                if (map[i][j] == symb) count_1++;
+                else count_1 = 0;
+                if (count_1 == dot) win = true;
+//8
+                if (map[j][i] == symb) count_2++;
+                else count_2 = 0;
+                if (count_2 == dot) win = true;
             }
-        }
-//диагональ 1
-        int lp_1 = 0;
-        for (int i = 0; i < SIZE; i++, lp_1++) {
-            if (map[i][lp_1] == symb) winCount3++;
-            if (map[i][lp_1] == DOT_EMPTY) winCount3 = 0;
-            if (winCount3 == DOTS_TO_WIN) win = true;
-        }
-//диагональ 2
-        int lp_2 = 0;
-        for (int r = SIZE-1; r >= 0; r--, lp_2++) {
-            if (map[r][lp_2] == symb) winCount4++;
-            if (map[r][lp_2] == DOT_EMPTY) winCount4 = 0;
-            if (winCount4 == DOTS_TO_WIN) win = true;
-        }
-//диагональ 3*
-        int lp_3 = 1;
-        for (int i = 0; i < SIZE && lp_3 < SIZE; i++, lp_3++) {
-            if (map[i][lp_3] == symb) winCount5++;
-            if (winCount5 == DOTS_TO_WIN) win = true;
-        }
-//диагональ 4*
-        int lp_4 = 0;
-        for (int i = 1; i < SIZE && lp_4 < SIZE; i++, lp_4++) {
-            if (map[i][lp_4] == symb) winCount6++;
-            if (winCount6 == DOTS_TO_WIN) win = true;
-        }
-//диагональ 5*
-        int lp_5 = SIZE - 2;
-        for (int i = 0; i < SIZE && lp_5 >= 0; i++, lp_5--) {
-            if (map[i][lp_5] == symb) winCount7++;
-            if (winCount7 == DOTS_TO_WIN) win = true;
-        }
-//диагональ 6*
-        int lp_6 = SIZE - 1;
-        for (int i = 1; i < SIZE && lp_6 >= 0; i++, lp_6--) {
-            if (map[i][lp_6] == symb) winCount8++;
-            if (winCount8 == DOTS_TO_WIN) win = true;
         }
         return win;
     }
-}
 
+
+}
