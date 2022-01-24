@@ -2,14 +2,19 @@ package lesson_4;
 import java.util.Random;
 import java.util.Scanner;
 //**************************Крестики-нолики в процедурном стиле**************************//
-public class TicTacToy {
+/**
+ * -проверка разбивает массив 5х5 на подмассивы 4х4 и проверяет их, т.е. проверяет
+ * не только основные диагонали, а вообще - все...
+ * ии научил только блокировать при больше 3х,
+ * думаю можно за недельку и красивый ии сделать, пока не знаю как лучше...
+ * */
+public class TicTacToe {
     public static char[][] map;
     public static final int SIZE = 5;
     public static final int DOTS_TO_WIN = 4;
     public static final char DOT_EMPTY = '•';   // 8226 UTF
     public static final char DOT_X = 'X';
     public static final char DOT_O = 'O';
-    public static final int DANGER_FOR_AI = 3;
 
 
     public static Random rand = new Random();
@@ -21,7 +26,7 @@ public class TicTacToy {
         while (true) {
             humanTurn();
             printMap();
-            if (checkWin(DOT_X, DOTS_TO_WIN)) {
+            if (checkWin(DOT_X)) {
                 System.out.println("Победил человек");
                 break;
             } if (isMapFull()) {
@@ -29,7 +34,7 @@ public class TicTacToy {
                 break;
             } aiTurn();
             printMap();
-            if (checkWin(DOT_O, DOTS_TO_WIN)) {
+            if (checkWin(DOT_O)) {
                 System.out.println("Победил Искуственный Интеллект");
                 break;
             } if (isMapFull()) {
@@ -83,15 +88,12 @@ public class TicTacToy {
         int y = -1;
         boolean aiWin = false;
         boolean humanWin = false;
-        boolean humanCheck = false;
-        boolean dangerAI = false;
-        boolean rnd = false;
 //1
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (isCellValid(i, j)){
                     map[i][j] = DOT_O;
-                    if (checkWin(DOT_O, DOTS_TO_WIN)){
+                    if (checkWin(DOT_O)){
                         x = i;
                         y = j;
                         aiWin = true;
@@ -106,7 +108,7 @@ public class TicTacToy {
                 for (int j = 0; j < SIZE; j++) {
                     if (isCellValid(i, j)){
                         map[i][j] = DOT_X;
-                        if (checkWin(DOT_X, DOTS_TO_WIN)){
+                        if (checkWin(DOT_X)){
                             x = i;
                             y = j;
                             humanWin = true;
@@ -116,55 +118,7 @@ public class TicTacToy {
                 }
             }
         }
-//3
-        if (!humanWin){
-            for (int i = 0; i < SIZE; i++) {
-                for (int j = 0; j < SIZE; j++) {
-                    if (isCellValid(i, j)){
-                        map[i][j] = DOT_O;
-                        if (checkWin(DOT_O, DANGER_FOR_AI)){
-                            x = i;
-                            y = j;
-                            humanCheck = true;
-                        }
-                        map [i][j] = DOT_EMPTY;
-                    }
-                }
-            }
-        }
-//4
-        if (!humanCheck){
-            for (int i = 0; i < SIZE; i++) {
-                for (int j = 0; j < SIZE; j++) {
-                    if (isCellValid(i, j)){
-                        map[i][j] = DOT_X;
-                        if (checkWin(DOT_X, DANGER_FOR_AI)){
-                            x = i;
-                            y = j;
-                            dangerAI = true;
-                        }
-                        map [i][j] = DOT_EMPTY;
-                    }
-                }
-            }
-        }
-        if (!dangerAI){
-            for (int i = 0; i < SIZE; i++) {
-                for (int j = 0; j < SIZE; j++) {
-                    if (isCellValid(i, j)){
-                        map[i][j] = DOT_O;
-                        if (checkWin(DOT_O, DANGER_FOR_AI-1)){
-                            x = i;
-                            y = j;
-                            rnd = true;
-                        }
-                        map [i][j] = DOT_EMPTY;
-                    }
-                }
-            }
-        }
-
-        if (!aiWin && !humanWin && !humanCheck && !dangerAI && !rnd){
+        if (!aiWin && !humanWin){
             do {
                 x = rand.nextInt(SIZE);
                 y = rand.nextInt(SIZE);
@@ -180,60 +134,40 @@ public class TicTacToy {
             }
         } return true;
     }
-    public static boolean checkWin(char symb, int dot) {    //Переделано циклом for
-        boolean win = false;
-        int count_1;
-        int count_2;
-        int count_3 = 0;
-        int count_4 = 0;
-        int count_5 = 0;
-        int count_6 = 0;
-        int count_7 = 0;
-        int count_8 = 0;
-
-        for (int i = 0, a = SIZE - 1; i < SIZE && a >= 0; i++, a--) {
-//1
-            if (map[i][i] == symb) count_3++;
-            else count_3 = 0;
-            if (count_3 == dot) win = true;
-//2
-            if (map[a][i] == symb) count_4++;
-            else count_4 = 0;
-            if (count_4 == dot) win = true;
+    public static boolean checkDiagonal(char symb, int shuffle_x, int shuffle_y) {
+        boolean to_right, to_left;
+        to_right = true;
+        to_left = true;
+        for (int i = 0; i < DOTS_TO_WIN; i++) {
+            to_right &= (map[i + shuffle_x][i + shuffle_y] == symb);
+            to_left &= (map[DOTS_TO_WIN+shuffle_y-i-1][i+shuffle_x] == symb);
         }
-        for (int i = 0, z = 1, a = SIZE - 1; i < SIZE && z < SIZE && a >= 0 ; i++, z++, a--) {
-            count_1 = 0;
-            count_2 = 0;
-//3
-            if (map[i][z] == symb) count_5++;
-            //else count_5 = 0;
-            if (count_5 == dot) win = true;
-//4
-            if (map[z][i] == symb) count_6++;
-            //else count_6 = 0;
-            if (count_6 == dot) win = true;
-//5
-            if (map[i][a-1] == symb) count_7++;
-            //else count_7 = 0;
-            if (count_7 == dot) win = true;
-//6
-            if (map[a][z] == symb) count_8++;
-            //else count_8 = 0;
-            if (count_8 == dot) win = true;
-
-            for (int j = 0; j < SIZE; j++) {
-//7
-                if (map[i][j] == symb) count_1++;
-                else count_1 = 0;
-                if (count_1 == dot) win = true;
-//8
-                if (map[j][i] == symb) count_2++;
-                else count_2 = 0;
-                if (count_2 == dot) win = true;
+        if (to_right || to_left) return true;
+        return  false;
+    }
+    public static boolean checkLines (char symb, int shuffle_x, int shuffle_y) {
+        boolean cols, rows;
+        for (int col = shuffle_x; col < DOTS_TO_WIN + shuffle_x; col++) {//col/row
+            cols = true;
+            rows = true;
+            for (int row = shuffle_y; row < DOTS_TO_WIN + shuffle_y; row++) {
+                cols &= (map[col][row] == symb);
+                rows &= (map[row][col] == symb);
+            }
+            if (cols || rows) return true;
+        }
+        return false;
+    }
+    public static boolean checkWin(char symb){
+        for (int col = 0; col <= SIZE - DOTS_TO_WIN; col++) {// factor = 1 - for 5x5
+            for (int row = 0; row <= SIZE - DOTS_TO_WIN; row++) {
+                if (checkDiagonal(symb, col, row) || checkLines(symb, col, row)) return true;
             }
         }
-        return win;
+        return false;
     }
 
 
+
 }
+
