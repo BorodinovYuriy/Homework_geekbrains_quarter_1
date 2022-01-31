@@ -26,5 +26,6 @@ public class Plate {
     String plateFullInfo(){
         return "Название миски: "+ this.foodName +". "+
                 " Наполненность миски: " + this.food+". ";
+
     }
 }

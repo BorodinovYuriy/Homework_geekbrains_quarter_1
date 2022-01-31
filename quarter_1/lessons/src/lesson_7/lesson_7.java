@@ -36,5 +36,6 @@ public class lesson_7 {
         System.out.println(cat_1.catFullInfo());
         System.out.println();
         System.out.println(plate_1.plateFullInfo());
+
     }
 }

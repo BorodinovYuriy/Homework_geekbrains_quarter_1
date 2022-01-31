@@ -34,5 +34,6 @@ public class HungryCat {
     String catFullInfo(){
         return "Кличка: " + this.name + ". " +
                 "Аппетит: " + this.appetite + ". ";
+
     }
 }
